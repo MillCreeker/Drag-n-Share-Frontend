@@ -1,7 +1,7 @@
 const DNS = {};
 
-DNS.SUPABASE_URL="https://zvnqjoscnfxpufmuqinz.supabase.co/functions/v1/";
-DNS.SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bnFqb3NjbmZ4cHVmbXVxaW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIzNTgxOTcsImV4cCI6MjAwNzkzNDE5N30.1VrFoA3wEEuJCpBHeLTtw1wAlJ5FAA-g5RDdebiUmhU";
+DNS.SUPABASE_URL = "https://zvnqjoscnfxpufmuqinz.supabase.co/functions/v1/";
+DNS.SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bnFqb3NjbmZ4cHVmbXVxaW56Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIzNTgxOTcsImV4cCI6MjAwNzkzNDE5N30.1VrFoA3wEEuJCpBHeLTtw1wAlJ5FAA-g5RDdebiUmhU";
 
 DNS.COLORS = {
     'cultured': '#F1EDEE',
@@ -32,7 +32,7 @@ DNS.selectedFile = null;
 DNS.mode = null;
 
 
-DNS.init = function() {
+DNS.init = function () {
     DNS.changeMode(DNS.MODES.overview);
 
     if (DNS.getCookieValue('readCookieDisclaimer') === 'true') {
@@ -45,18 +45,18 @@ DNS.init = function() {
     }
 };
 
-DNS.getCookieValue = function(cookie) {
+DNS.getCookieValue = function (cookie) {
     const cookies = document.cookie;
-    const regex = new RegExp(`${cookie}=([\\w%]+)[,;] expires=([\\w\\d\\s,:\\-+\(\)]*)[;]* `,'g');
+    const regex = new RegExp(`${cookie}=([\\w\\d-]+)[,;] expires=([\\w\\d\\s,:\\-+\(\)]*)[;]* `, 'g');
     const matches = regex.exec(cookies);
-    
+
     if (matches == null || matches.length < 3) {
         return undefined;
     }
 
     const now = new Date();
     const expireDate = new Date(matches[2]);
-    
+
     if (expireDate < now) {
         return undefined;
     }
@@ -67,14 +67,14 @@ DNS.getCookieValue = function(cookie) {
 
 DNS.areFilesDroppable = true;
 
-dropContainer.ondragenter = function(evt) {
+dropContainer.ondragenter = function (evt) {
     if (DNS.areFilesDroppable == false) return;
 
     evt.preventDefault();
 
     DNS.ondDragEnter();
 };
-DNS.ondDragEnter = function() {
+DNS.ondDragEnter = function () {
     const dropContainer = document.getElementById("dropContainer");
 
     const children = dropContainer.getElementsByTagName('*');
@@ -82,7 +82,7 @@ DNS.ondDragEnter = function() {
         try {
             const child = children[i];
             DNS.disableElement(child.id);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     if (DNS.files.length >= DNS.MAX_FILES) {
@@ -93,7 +93,7 @@ DNS.ondDragEnter = function() {
     dropContainer.style['background-image'] = "url('./img/logo_outlines_lemon.png')";
 };
 
-dropContainer.ondragleave = function(evt) {
+dropContainer.ondragleave = function (evt) {
     if (DNS.areFilesDroppable == false) return;
 
     evt.preventDefault();
@@ -103,7 +103,7 @@ dropContainer.ondragleave = function(evt) {
 
     DNS.onDragLeave();
 };
-DNS.onDragLeave = function() {    
+DNS.onDragLeave = function () {
     const dropContainer = document.getElementById("dropContainer");
 
     const children = dropContainer.getElementsByTagName('*');
@@ -111,7 +111,7 @@ DNS.onDragLeave = function() {
         try {
             const child = children[i];
             DNS.enableElement(child.id);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     dropContainer.style['border-color'] = DNS.COLORS["eerie-black-d"];
@@ -122,10 +122,10 @@ DNS.onDragLeave = function() {
     }
 };
 
-DNS.isInContainer = function(evt) {
+DNS.isInContainer = function (evt) {
     let isInContainer = true;
     const rect = document.getElementById("dropContainer").getBoundingClientRect();
-    
+
     if (evt.clientY < rect.top ||
         evt.clientY >= rect.bottom ||
         evt.clientX < rect.left ||
@@ -136,7 +136,7 @@ DNS.isInContainer = function(evt) {
     return isInContainer;
 };
 
-dropContainer.ondragover = function(evt) {
+dropContainer.ondragover = function (evt) {
     if (DNS.areFilesDroppable == false) return;
 
     evt.preventDefault();
@@ -144,18 +144,18 @@ dropContainer.ondragover = function(evt) {
     DNS.closeDeleteDialogForFile();
 };
 
-dropContainer.ondrop = function(evt) {
+dropContainer.ondrop = function (evt) {
     if (DNS.areFilesDroppable == false) return;
 
     evt.preventDefault();
 
     DNS.onDragLeave();
     DNS.changeMode(DNS.MODES.fileUpload);
-    
+
     const files = evt.dataTransfer.files;
     const dT = new DataTransfer();
 
-    for (let i=0; i<files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
         const file = files[i];
         dT.items.add(file);
     }
@@ -164,25 +164,25 @@ dropContainer.ondrop = function(evt) {
     DNS.processFiles(workableFiles);
 };
 
-fileUpload.onclick = function() {
+fileUpload.onclick = function () {
     this.value = null;
 };
-fileUpload.oninput = function(evt) {
+fileUpload.oninput = function (evt) {
     DNS.addFiles(evt);
 };
-fileAdd.onclick = function() {
+fileAdd.onclick = function () {
     this.value = null;
 };
-fileAdd.oninput = function(evt) {
+fileAdd.oninput = function (evt) {
     DNS.addFiles(evt);
 };
-DNS.addFiles = function(evt) {
+DNS.addFiles = function (evt) {
     DNS.changeMode(DNS.MODES.fileUpload);
-    
+
     const files = evt.currentTarget.files;
     const dT = new DataTransfer();
 
-    for (let i=0; i<files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
         const file = files[i];
         dT.items.add(file);
     }
@@ -191,11 +191,11 @@ DNS.addFiles = function(evt) {
     DNS.processFiles(workableFiles);
 };
 
-DNS.processFiles = function(files) {
+DNS.processFiles = function (files) {
     const fileList = document.getElementById('file-upload-list');
-    
-    for (let i=0; i<files.length; i++) {
-        if (DNS.files.length == DNS.MAX_FILES-1) {
+
+    for (let i = 0; i < files.length; i++) {
+        if (DNS.files.length == DNS.MAX_FILES - 1) {
             DNS.disableElement('file-upload-add');
         }
         if (DNS.files.length == DNS.MAX_FILES) {
@@ -208,7 +208,7 @@ DNS.processFiles = function(files) {
         const number = DNS.files.length;
         const listItem = DNS.createListItemForFile(`file-${number}`, file, DNS.showDeleteDialogForFile);
 
-        fileList.insertBefore(listItem, fileList.children[fileList.children.length-1]);
+        fileList.insertBefore(listItem, fileList.children[fileList.children.length - 1]);
         DNS.files.push(file);
     }
 
@@ -217,7 +217,7 @@ DNS.processFiles = function(files) {
     DNS.checkGoButtonEnabled();
 };
 
-DNS.showAlert = function(text) {
+DNS.showAlert = function (text) {
     const msgBox = document.getElementById('msg-box-alert');
     if (msgBox.style.display != 'none') {
         DNS.closeAlert();
@@ -231,13 +231,13 @@ DNS.showAlert = function(text) {
     DNS.showElement('msg-box-alert');
 };
 
-DNS.createGlassPlate = function(onClick) {
+DNS.createGlassPlate = function (onClick) {
     const glassPlate = document.createElement('div');
     glassPlate.classList.add('glass-plate');
     glassPlate.id = 'glass-plate';
 
     if (typeof onClick === 'function') {
-        glassPlate.onclick = function() {
+        glassPlate.onclick = function () {
             onClick();
         };
     }
@@ -245,7 +245,7 @@ DNS.createGlassPlate = function(onClick) {
     document.body.appendChild(glassPlate);
 };
 
-DNS.closeAlert = function() {
+DNS.closeAlert = function () {
     DNS.hideElement('msg-box-alert');
     DNS.removeGlassPlate();
 
@@ -256,14 +256,14 @@ DNS.closeAlert = function() {
     DNS.checkAccessDataButtonEnabled();
 };
 
-DNS.removeGlassPlate = function() {
+DNS.removeGlassPlate = function () {
     const plate = document.getElementById('glass-plate');
     if (plate != null) {
         document.body.removeChild(plate);
     }
 };
 
-DNS.createListItemForFile = function(id, file, onClick) {
+DNS.createListItemForFile = function (id, file, onClick) {
     const listItem = document.createElement('li');
     listItem.id = id;
     listItem.classList.add('file-list-item');
@@ -280,15 +280,15 @@ DNS.createListItemForFile = function(id, file, onClick) {
     listItem.appendChild(text);
 
     if (typeof onClick == 'function') {
-        listItem.onclick = function(evt) {
+        listItem.onclick = function (evt) {
             onClick(evt);
         };
     }
-        
+
     return listItem;
 };
 
-DNS.shortenName = function(name, length) {
+DNS.shortenName = function (name, length) {
     if (length < 8) {
         return name;
     }
@@ -300,19 +300,19 @@ DNS.shortenName = function(name, length) {
 
     const fileName = nameSplit[0];
     const fileExt = nameSplit[1];
-    
+
     let shortName = `${fileName}.${fileExt}`;
     if (shortName.length <= length) {
         return shortName;
     }
 
-    shortName = fileName.substring(0,length-(fileExt.length+3));
+    shortName = fileName.substring(0, length - (fileExt.length + 3));
     shortName += `...${fileExt}`;
     return shortName;
 };
 
 DNS.isFileSelected = false;
-DNS.showDeleteDialogForFile = function(evt) {
+DNS.showDeleteDialogForFile = function (evt) {
     const msgBox = document.getElementById('msg-box-delete-file');
     if (msgBox.style.display != 'none') {
         DNS.closeDeleteDialogForFile();
@@ -328,7 +328,7 @@ DNS.showDeleteDialogForFile = function(evt) {
     DNS.isFileSelected = true;
 };
 
-DNS.closeDeleteDialogForFile = function() {
+DNS.closeDeleteDialogForFile = function () {
     DNS.hideElement('msg-box-delete-file');
     DNS.removeGlassPlate();
 
@@ -340,7 +340,7 @@ DNS.closeDeleteDialogForFile = function() {
     DNS.checkGoButtonEnabled();
 };
 
-DNS.deleteFile = function() {
+DNS.deleteFile = function () {
     if (DNS.selectedFile == null) {
         DNS.closeDeleteDialogForFile();
         return;
@@ -353,14 +353,14 @@ DNS.deleteFile = function() {
         return;
     }
     const index = match[1];
-    
+
     const fileList = document.getElementById('file-upload-list');
     const deletedFile = document.getElementById(DNS.selectedFile);
     fileList.removeChild(deletedFile);
 
     DNS.files.splice(index, 1);
-    
-    for (let i=index; i<fileList.children.length-1; i++) {
+
+    for (let i = index; i < fileList.children.length - 1; i++) {
         const elem = fileList.children[i];
         elem.id = `file-${i}`;
     }
@@ -372,17 +372,17 @@ DNS.deleteFile = function() {
     DNS.closeDeleteDialogForFile();
 };
 
-DNS.showElement = function(element) {
+DNS.showElement = function (element) {
     const elem = document.getElementById(element);
     elem.style.display = 'block';
 };
-DNS.hideElement = function(element) {
+DNS.hideElement = function (element) {
     const elem = document.getElementById(element);
     elem.style.display = 'none';
 };
 
 
-DNS.changeMode = function(mode) {
+DNS.changeMode = function (mode) {
     if (mode === DNS.mode) {
         return;
     }
@@ -405,7 +405,7 @@ DNS.changeMode = function(mode) {
 
     const fileList = document.getElementById('file-upload-list');
     const listChildren = fileList.children.length;
-    for (let i=0; i<listChildren; i++) {
+    for (let i = 0; i < listChildren; i++) {
         if (fileList.firstChild.id == 'file-upload-add') {
             continue;
         }
@@ -466,7 +466,7 @@ DNS.changeMode = function(mode) {
     };
 
     const list = document.getElementById('dropList');
-    for (let i=0; i<list.children.length; i++) {
+    for (let i = 0; i < list.children.length; i++) {
         const elem = list.children[i];
         elem.style.display = 'none';
     }
@@ -490,7 +490,7 @@ DNS.changeMode = function(mode) {
     DNS.checkAccessDataButtonEnabled();
 };
 
-DNS.focusTitle = function() {
+DNS.focusTitle = function () {
     const listTextName = document.getElementById('list-text-name');
     if (listTextName.style.display === 'block') {
         const textName = document.getElementById('text-name');
@@ -498,7 +498,7 @@ DNS.focusTitle = function() {
     }
 };
 
-DNS.enableElement = function(element) {
+DNS.enableElement = function (element) {
     const elem = document.getElementById(element);
 
     elem.disabled = false;
@@ -506,7 +506,7 @@ DNS.enableElement = function(element) {
     elem.style['-moz-drag-over'] = '';
     elem.style.opacity = 1;
 };
-DNS.disableElement = function(element) {
+DNS.disableElement = function (element) {
     const elem = document.getElementById(element);
 
     elem.disabled = true;
@@ -515,12 +515,12 @@ DNS.disableElement = function(element) {
     elem.style.opacity = 0.7;
 };
 
-DNS.showNameDescription = function(doShow) {
+DNS.showNameDescription = function (doShow) {
     const nameDescription = document.getElementById('name-description');
     nameDescription.style.display = doShow ? 'block' : 'none';
 };
 
-DNS.handleDisableTitle = function(mode) {
+DNS.handleDisableTitle = function (mode) {
     const textName = document.getElementById('text-name');
 
     switch (mode) {
@@ -535,36 +535,36 @@ DNS.handleDisableTitle = function(mode) {
     };
 };
 
-DNS.handleModeDataSent = function(isModeDataSent) {
+DNS.handleModeDataSent = function (isModeDataSent) {
     DNS.areFilesDroppable = !isModeDataSent;
 
     if (isModeDataSent == false) {
         return;
     }
 
-    DNS.httpSendAsync('GET', 'get_access_key_and_name', null,
-        function(resp) {
-            if (resp == '' || resp == null) { 
+    DNS.httpSendAsync('GET', 'get-access-key-and-name', null,
+        function (resp) {
+            if (resp == '' || resp == null) {
                 DNS.showAlert('An unexpected error occurred');
                 DNS.changeMode(DNS.MODES.overview);
                 return
             }
             jsonResp = JSON.parse(resp);
             accessKey = jsonResp.accessKey;
-            
+
             const nameText = document.getElementById('text-name');
             nameText.value = jsonResp.name;
             const keyField = document.getElementById('access-key');
-            keyField.innerHTML = `${accessKey.substring(0,3)} ${accessKey.substring(3)}`;
+            keyField.innerHTML = `${accessKey.substring(0, 3)} ${accessKey.substring(3)}`;
         },
-        function(resp, status) {
+        function (resp, status) {
             document.cookie = 'ownerId=""';
             DNS.changeMode(DNS.MODES.overview);
         }
     );
 };
 
-DNS.handleModeViewReceived = function(isModeViewReceived) {
+DNS.handleModeViewReceived = function (isModeViewReceived) {
     const textarea = document.getElementById('data-textarea');
     const btnPaste = document.getElementById('btn-copy-to-textarea');
     const btnAddFile = document.getElementById('file-upload-add');
@@ -576,7 +576,7 @@ DNS.handleModeViewReceived = function(isModeViewReceived) {
     if (isModeViewReceived == true) DNS.showDonationsPupUp();
 }
 
-DNS.showMoreOptions = function() {
+DNS.showMoreOptions = function () {
     const moreOptions = document.getElementById('list-more-options');
     const dataSentOptions = document.getElementById('list-data-sent-options');
     const accessDataInstructions = document.getElementById('list-access-data-instructions');
@@ -589,11 +589,11 @@ DNS.showMoreOptions = function() {
 };
 
 
-DNS.showDonationsPupUp = function() {
+DNS.showDonationsPupUp = function () {
     DNS.showElement('pop-up-donation');
     DNS.createGlassPlate(DNS.hideDonationsPupUp);
 };
-DNS.hideDonationsPupUp = function() {
+DNS.hideDonationsPupUp = function () {
     DNS.removeGlassPlate();
     DNS.hideElement('pop-up-donation');
 };
@@ -624,12 +624,12 @@ DNS.pasteClipBoardTextToElement = function (element) {
 };
 
 
-DNS.checkGoButtonEnabled = function() {
+DNS.checkGoButtonEnabled = function () {
     let isEnabled = true;
     let title = 'Ready to share data';
 
     if (isEnabled == true &&
-        DNS.mode != DNS.MODES.fileUpload  &&
+        DNS.mode != DNS.MODES.fileUpload &&
         DNS.mode != DNS.MODES.textOnly) {
         isEnabled = false;
         title = 'Not possible in this mode';
@@ -663,13 +663,13 @@ DNS.checkGoButtonEnabled = function() {
     goBtn.title = title;
 };
 
-DNS.submitData = function() {
+DNS.submitData = function () {
     DNS.httpSendAsync('GET', 'ping', null,
-        function(resp) {
+        function (resp) {
             DNS.uploadData();
         },
-        function(resp, status) {
-            
+        function (resp, status) {
+
         }
     );
 };
@@ -678,7 +678,7 @@ DNS.httpSendAsync = function (type, route, body, successFunc, errorFunc) {
     DNS.busyShow();
     var xmlHttp = new XMLHttpRequest();
 
-    xmlHttp.onreadystatechange = function() {
+    xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4) {
             if (xmlHttp.status == 200) {
                 successFunc(xmlHttp.responseText);
@@ -708,21 +708,21 @@ DNS.httpSendAsync = function (type, route, body, successFunc, errorFunc) {
     xmlHttp.send(body);
 }
 
-DNS.busyShow = function() {
+DNS.busyShow = function () {
     DNS.createGlassPlate();
 
     const busyIndicator = document.getElementById('busy-indicator');
     busyIndicator.style.display = 'block';
 };
 
-DNS.busyHide = function() {
+DNS.busyHide = function () {
     const busyIndicator = document.getElementById('busy-indicator');
     busyIndicator.style.display = 'none';
 
     DNS.removeGlassPlate();
 };
 
-DNS.uploadData = async function() {
+DNS.uploadData = async function () {
     const title = document.getElementById('text-name').value;
     let data = null;
 
@@ -738,14 +738,14 @@ DNS.uploadData = async function() {
                 reader.onerror = error => reject(error);
             });
             try {
-                for (let i=0; i<DNS.files.length; i++) {
+                for (let i = 0; i < DNS.files.length; i++) {
                     const file = DNS.files[i];
                     const base64 = await toBase64(file);
                     const fileString = `name:${file.name};${base64}`;
-                    
+
                     fileArr.push(fileString);
                 }
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 DNS.showAlert('Looks like your files refused to be uploaded :.(');
                 break;
@@ -761,23 +761,23 @@ DNS.uploadData = async function() {
 
     const body = JSON.stringify({
         name: title,
-        content: data,
+        data: data,
         isTextOnly: DNS.mode == DNS.MODES.textOnly
     });
 
     DNS.httpSendAsync('POST', 'upload-data',
         body,
-        function(resp) {
+        function (resp) {
             DNS.createCookie('ownerId', resp, 5);
             DNS.changeMode(DNS.MODES.dataSent);
         },
-        function(resp, status) {
-            
+        function (resp, status) {
+
         }
     );
 };
 
-DNS.createCookie = function(name, value, expiresInMin=null) {
+DNS.createCookie = function (name, value, expiresInMin = null) {
     let expireDate = null;
     const now = new Date();
 
@@ -792,42 +792,46 @@ DNS.createCookie = function(name, value, expiresInMin=null) {
     document.cookie = `${name}=${value}, expires=${expireDate}`;
 };
 
-DNS.refresh = function() {
+DNS.refresh = function () {
     const textName = document.getElementById('text-name');
     const title = textName.value;
 
+    const body = JSON.stringify({
+        name: title
+    });
+
     DNS.httpSendAsync('POST', 'refresh',
-        title,
-        function(resp) {
+        body,
+        function (resp) {
             DNS.handleModeDataSent(true);
             DNS.showMoreOptions();
         },
-        function(resp, status) {
+        function (resp, status) {
 
         }
     );
 };
 
-DNS.showDeleteDataDialog = function() {
+DNS.showDeleteDataDialog = function () {
     DNS.createGlassPlate(DNS.closeDeleteDataDialog);
     DNS.showElement('msg-box-delete-data');
 };
 
-DNS.closeDeleteDataDialog = function() {
+DNS.closeDeleteDataDialog = function () {
     DNS.removeGlassPlate();
     DNS.hideElement('msg-box-delete-data');
 };
 
-DNS.deleteData = function() {
+DNS.deleteData = function () {
     DNS.closeDeleteDataDialog();
 
     DNS.httpSendAsync('DELETE', 'delete',
         null,
-        function(resp) {
+        function (resp) {
             document.cookie = 'ownerId=""';
             DNS.changeMode(DNS.MODES.overview);
         },
-        function(resp, status) {
+        function (resp, status) {
             document.cookie = 'ownerId=""';
             DNS.changeMode(DNS.MODES.overview);
         }
@@ -835,11 +839,11 @@ DNS.deleteData = function() {
     DNS.changeMode(DNS.MODES.overview);
 };
 
-DNS.accessData = function() {
+DNS.accessData = function () {
     DNS.changeMode(DNS.MODES.accessData);
 };
 
-DNS.checkSearchButtonEnabled = function() {
+DNS.checkSearchButtonEnabled = function () {
     let isEnabled = true;
     let title = 'Ready to search';
 
@@ -862,24 +866,24 @@ DNS.checkSearchButtonEnabled = function() {
     searchBtn.title = title;
 };
 
-DNS.searchName = function() {
+DNS.searchName = function () {
     const textname = document.getElementById('text-name');
     const name = textname.value;
 
     DNS.httpSendAsync('POST', 'search_name',
         name,
-        function(resp) {
+        function (resp) {
             DNS.changeMode(DNS.MODES.enterKey);
             const keyField = document.getElementById('access-key-search-field');
             keyField.focus();
         },
-        function(resp, status) {
-            
+        function (resp, status) {
+
         }
     );
 };
 
-DNS.checkAccessDataButtonEnabled = function() {
+DNS.checkAccessDataButtonEnabled = function () {
     let isEnabled = true;
     let title = 'Access Data';
 
@@ -902,9 +906,9 @@ DNS.checkAccessDataButtonEnabled = function() {
     accessBtn.title = title;
 };
 
-DNS.onInputAccessKeySearchField = function() {
+DNS.onInputAccessKeySearchField = function () {
     const searchField = document.getElementById("access-key-search-field");
-    searchField.addEventListener("input", function() {
+    searchField.addEventListener("input", function () {
         let value = searchField.value;
         value = value.replace(/\D/g, "");
         value = value.replace(/(\d{3})(?=\d)/g, "$1 ");
@@ -912,7 +916,7 @@ DNS.onInputAccessKeySearchField = function() {
     });
 };
 
-DNS.validateKey = function() {
+DNS.validateKey = function () {
     const keyField = document.getElementById('access-key-search-field');
     const accessKey = keyField.value.replace(' ', '');
 
@@ -922,21 +926,21 @@ DNS.validateKey = function() {
         name: textName.value,
         key: accessKey
     });
-    
+
     DNS.httpSendAsync('POST', 'access_data',
-    body,
-        function(resp) {
+        body,
+        function (resp) {
             DNS.handleReceivedData(resp);
         },
-        function(resp, status) {
+        function (resp, status) {
             DNS.changeMode(DNS.MODES.accessData);
         }
     );
 };
 
-DNS.handleReceivedData = function(response) {
+DNS.handleReceivedData = function (response) {
     const resp = DNS.processReceivedData(response);
-    
+
     if (resp.isTextOnly == true) {
         DNS.displayReceivedText(resp.data);
     } else {
@@ -947,7 +951,7 @@ DNS.handleReceivedData = function(response) {
     textName.value = resp.name;
 };
 
-DNS.processReceivedData = function(response) {
+DNS.processReceivedData = function (response) {
     const resp = JSON.parse(response);
 
     if (typeof resp.name == 'undefined' ||
@@ -959,9 +963,9 @@ DNS.processReceivedData = function(response) {
         typeof resp.isTextOnly == 'undefined' ||
         resp.isTextOnly == null ||
         (resp.isTextOnly != true &&
-        resp.isTextOnly != false)) {
-            DNS.showAlert('Received data is incomplete, please try again.');
-            DNS.changeMode(DNS.MODES.accessData);
+            resp.isTextOnly != false)) {
+        DNS.showAlert('Received data is incomplete, please try again.');
+        DNS.changeMode(DNS.MODES.accessData);
     }
 
     const name = resp.name;
@@ -987,7 +991,7 @@ DNS.processReceivedData = function(response) {
     return processedData;
 };
 
-DNS.displayReceivedText = function(text) {
+DNS.displayReceivedText = function (text) {
     DNS.changeMode(DNS.MODES.viewReceivedText);
 
     const textarea = document.getElementById('data-textarea');
@@ -995,15 +999,15 @@ DNS.displayReceivedText = function(text) {
     textarea.value = text;
 };
 
-DNS.displayReceivedData = function(data) {
+DNS.displayReceivedData = function (data) {
     DNS.changeMode(DNS.MODES.viewReceivedData);
 
     DNS.files = [];
     const fileList = document.getElementById('file-upload-list');
 
-    for (let i=0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         const fileString = data[i];
-        const regex = new RegExp('name:(.*);(data:.*base64,.*)','g');
+        const regex = new RegExp('name:(.*);(data:.*base64,.*)', 'g');
         const matches = regex.exec(fileString);
 
         if (matches == null) {
@@ -1015,7 +1019,7 @@ DNS.displayReceivedData = function(data) {
             console.error('There was an error while decoding a file', fileString);
             continue;
         }
-        
+
         const name = matches[1];
         const dataUrl = matches[2];
 
@@ -1023,7 +1027,7 @@ DNS.displayReceivedData = function(data) {
 
         try {
             file = DNS.dataURLToFile(dataUrl, name);
-        } catch(e) {
+        } catch (e) {
             console.error('There was an error while decoding a file', fileString);
             continue;
         }
@@ -1036,29 +1040,29 @@ DNS.displayReceivedData = function(data) {
         const number = DNS.files.length;
         const listItem = DNS.createListItemForFile(`file-${number}`, file, DNS.downloadFile);
 
-        fileList.insertBefore(listItem, fileList.children[fileList.children.length-1]);
+        fileList.insertBefore(listItem, fileList.children[fileList.children.length - 1]);
         DNS.files.push(file);
     }
 };
 
-DNS.dataURLToFile = function(dataUrl, filename) {
+DNS.dataURLToFile = function (dataUrl, filename) {
     const arr = dataUrl.split(','),
         mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]);
     let n = bstr.length,
         u8arr = new Uint8Array(n);
-        
-    while(n--){
+
+    while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
     }
-    
-    const file = new File([u8arr], filename, {type:mime});
+
+    const file = new File([u8arr], filename, { type: mime });
     return file
 };
 
-DNS.downloadFile = async function(evt) {
+DNS.downloadFile = async function (evt) {
     const id = evt.currentTarget.id
-    
+
     const regex = new RegExp('file-(\\d+)');
     const match = regex.exec(id);
 
@@ -1083,7 +1087,7 @@ DNS.downloadFile = async function(evt) {
     let base64 = null;
     try {
         base64 = await toBase64(file);
-    } catch(e) {
+    } catch (e) {
         console.error(e);
         DNS.showAlert('There was an error downloading the file');
         return;
@@ -1092,7 +1096,7 @@ DNS.downloadFile = async function(evt) {
     DNS.downloadDataUrl(base64, file.name);
 };
 
-DNS.downloadDataUrl = function(dataUrl, filename) {
+DNS.downloadDataUrl = function (dataUrl, filename) {
     const link = document.createElement("a");
     link.download = filename;
     link.href = dataUrl;
@@ -1102,22 +1106,22 @@ DNS.downloadDataUrl = function(dataUrl, filename) {
     delete link;
 };
 
-DNS.copyTextToClipboard = function() {
+DNS.copyTextToClipboard = function () {
     const textarea = document.getElementById('data-textarea');
 
     navigator.clipboard.writeText(textarea.value)
-        .then(function() {
+        .then(function () {
             textarea.style.borderColor = DNS.COLORS['burnt-orange'];
 
-            setTimeout(function() {
+            setTimeout(function () {
                 textarea.style.borderColor = DNS.COLORS['eerie-black-d'];
             }, 1000);
         });
 };
 
-DNS.downloadAllFiles = async function() {
+DNS.downloadAllFiles = async function () {
 
-    for (let i=0; i < DNS.files.length; i++) {
+    for (let i = 0; i < DNS.files.length; i++) {
         const file = DNS.files[i];
 
         const toBase64 = file => new Promise((resolve, reject) => {
@@ -1130,7 +1134,7 @@ DNS.downloadAllFiles = async function() {
         let base64 = null;
         try {
             base64 = await toBase64(file);
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             DNS.showAlert('There was an error downloading the file');
             continue;
@@ -1140,13 +1144,13 @@ DNS.downloadAllFiles = async function() {
     }
 };
 
-DNS.closeCookieBanner = function() {
+DNS.closeCookieBanner = function () {
     DNS.hideElement('cookie-banner');
 
     DNS.createCookie('readCookieDisclaimer', 'true');
 };
 
-DNS.onclickDonationPopUpBtn = function() {
+DNS.onclickDonationPopUpBtn = function () {
     DNS.hideElement('pop-up-donation');
     DNS.removeGlassPlate();
 

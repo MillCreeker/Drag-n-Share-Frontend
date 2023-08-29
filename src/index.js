@@ -870,8 +870,12 @@ DNS.searchName = function () {
     const textname = document.getElementById('text-name');
     const name = textname.value;
 
-    DNS.httpSendAsync('POST', 'search_name',
-        name,
+    const body = JSON.stringify({
+        name: name
+    });
+
+    DNS.httpSendAsync('POST', 'search-name',
+        body,
         function (resp) {
             DNS.changeMode(DNS.MODES.enterKey);
             const keyField = document.getElementById('access-key-search-field');
@@ -927,7 +931,7 @@ DNS.validateKey = function () {
         key: accessKey
     });
 
-    DNS.httpSendAsync('POST', 'access_data',
+    DNS.httpSendAsync('POST', 'access-data',
         body,
         function (resp) {
             DNS.handleReceivedData(resp);

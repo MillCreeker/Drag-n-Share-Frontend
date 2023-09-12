@@ -31,6 +31,8 @@ DNS.selectedFile = null;
 
 DNS.mode = null;
 
+DNS.ownerId = null;
+
 
 DNS.init = function () {
     DNS.changeMode(DNS.MODES.overview);
@@ -542,6 +544,11 @@ DNS.handleModeDataSent = function (isModeDataSent) {
         return;
     }
 
+    setTimeout(() => {
+        if (DNS.ownerId == null) return;
+        DNS.refresh();
+    }, 300000); // 5 minutes
+
     DNS.httpSendAsync('GET', 'get-access-key-and-name', null,
         function (resp) {
             if (resp == '' || resp == null) {
@@ -559,6 +566,7 @@ DNS.handleModeDataSent = function (isModeDataSent) {
         },
         function (resp, status) {
             document.cookie = 'ownerId=""';
+            DNS.ownerId = null;
             DNS.changeMode(DNS.MODES.overview);
         }
     );
@@ -700,7 +708,10 @@ DNS.httpSendAsync = function (type, route, body, successFunc, errorFunc) {
             DNS.busyHide();
         }
     }
-    const ownerId = DNS.getCookieValue('ownerId');
+    let ownerId = DNS.getCookieValue('ownerId');
+    if (typeof ownerId == 'undefined') {
+        ownerId = DNS.ownerId;
+    }
     xmlHttp.open(type, `${DNS.SUPABASE_URL}${route}`, true); // true for asynchronous 
     xmlHttp.setRequestHeader('Authorization', `Bearer ${DNS.SUPABASE_ANON_KEY}`);
     xmlHttp.setRequestHeader('apikey', DNS.SUPABASE_ANON_KEY);
@@ -760,7 +771,7 @@ DNS.uploadData = async function () {
     };
 
     const body = JSON.stringify({
-        name: title,
+        name: title.trim(),
         data: data,
         isTextOnly: DNS.mode == DNS.MODES.textOnly
     });
@@ -769,6 +780,7 @@ DNS.uploadData = async function () {
         body,
         function (resp) {
             DNS.createCookie('ownerId', resp, 5);
+            DNS.ownerId = resp;
             DNS.changeMode(DNS.MODES.dataSent);
         },
         function (resp, status) {
@@ -807,7 +819,11 @@ DNS.refresh = function () {
             DNS.showMoreOptions();
         },
         function (resp, status) {
-
+            if (status == 410 || status == 401) {
+                document.cookie = 'ownerId=""';
+                DNS.ownerId = null;
+                DNS.changeMode(DNS.MODES.overview);
+            }
         }
     );
 };
@@ -829,10 +845,12 @@ DNS.deleteData = function () {
         null,
         function (resp) {
             document.cookie = 'ownerId=""';
+            DNS.ownerId = null;
             DNS.changeMode(DNS.MODES.overview);
         },
         function (resp, status) {
             document.cookie = 'ownerId=""';
+            DNS.ownerId = null;
             DNS.changeMode(DNS.MODES.overview);
         }
     );
@@ -855,7 +873,7 @@ DNS.checkSearchButtonEnabled = function () {
 
     const textName = document.getElementById('text-name');
     if (isEnabled == true &&
-        textName.value.length == 7) {
+        textName.value.length == 0) {
         isEnabled = false;
         title = 'Name missing';
     }
@@ -868,7 +886,7 @@ DNS.checkSearchButtonEnabled = function () {
 
 DNS.searchName = function () {
     const textname = document.getElementById('text-name');
-    const name = textname.value;
+    const name = textname.value.trim();
 
     const body = JSON.stringify({
         name: name
@@ -927,7 +945,7 @@ DNS.validateKey = function () {
     const textName = document.getElementById('text-name');
 
     const body = JSON.stringify({
-        name: textName.value,
+        name: textName.value.trim(),
         key: accessKey
     });
 
